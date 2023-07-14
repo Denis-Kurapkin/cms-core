@@ -1,0 +1,11 @@
+application:
+  img-storage:
+    url: C:\some_name_of_folder
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cms-prostor
+    username: postgres
+    password: 1234
+  jpa:
+    show-sql: false

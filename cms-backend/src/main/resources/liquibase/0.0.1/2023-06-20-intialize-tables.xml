@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet id="extension" author="denis-kurapkin">
+        <sql>
+            CREATE
+            EXTENSION IF NOT EXISTS "uuid-ossp";
+        </sql>
+    </changeSet>
+    <changeSet id="2023-20-06-attachment-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="attachment"
+                     remarks="Файлы">
+            <column name="attachment_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="attachment_title"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attachment_url"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attachment_mime"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="attachment"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-manufacturer-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="manufacturer"
+                     remarks="Производители">
+            <column name="manufacturer_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="title"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="manufacturer"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-category-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="category"
+                     remarks="Категории товара">
+            <column name="category_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="parent_category_id"
+                    type="uuid">
+                <constraints foreignKeyName="parent_category_id"
+                             referencedTableName="category"
+                             referencedColumnNames="category_id"/>
+            </column>
+
+            <column name="status"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="title"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="category"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-product-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="product"
+                     remarks="Товар">
+            <column name="product_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="category_id"
+                    type="uuid">
+                <constraints foreignKeyName="products_category_id_fkey"
+                             referencedTableName="category"
+                             referencedColumnNames="category_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="manufacturer_id"
+                    type="uuid">
+                <constraints foreignKeyName="products_manufacturer_id_fkey"
+                             referencedTableName="manufacturer"
+                             referencedColumnNames="manufacturer_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="attachment_id"
+                    type="uuid">
+            </column>
+
+            <column name="title"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="article"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="price"
+                    type="NUMERIC(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="quantity"
+                    type="integer"
+                    defaultOnNull="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_active"
+                    type="boolean"
+                    defaultOnNull="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="product"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-attribute-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="attribute"
+                     remarks="Атрибуты товара">
+            <column name="attribute_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="title"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="attribute"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-attribute-value-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="attribute_value"
+                     remarks="Значения атрибутов товара">
+            <column name="attribute_value_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="attribute_id"
+                    type="uuid">
+                <constraints foreignKeyName="attribute_values_attribute_id_fkey"
+                             referencedTableName="attribute"
+                             referencedColumnNames="attribute_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="value"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint schemaName="public"
+                             tableName="attribute_value"
+                             columnNames="attribute_id, value"/>
+        <rollback>
+            <dropTable schemaName="public" tableName="attribute_value"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-attributes-j-products-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="attribute_j_product"
+                     remarks="Значения атрибутов товара">
+            <column name="product_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="attributes_i_products_product_id_fkey"
+                             referencedTableName="product"
+                             referencedColumnNames="product_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="attribute_value_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="attributes_i_products_attribute_value_id_fkey"
+                             referencedTableName="attribute_value"
+                             referencedColumnNames="attribute_value_id"
+                             nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="attribute_j_product"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-filters-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="filter"
+                     remarks="Фильтры категории">
+            <column name="filter_id"
+                    type="uuid"
+                    defaultValueComputed="uuid_generate_v4()">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+
+            <column name="is_active"
+                    type="boolean"
+                    defaultOnNull="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="filter_type"
+                    type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attribute_id"
+                    type="uuid">
+                <constraints foreignKeyName="filter_attribute_id_fkey"
+                             referencedTableName="attribute"
+                             referencedColumnNames="attribute_id"
+                             nullable="false"
+                             unique="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="filter"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-filters-j-categories-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="filter_j_category"
+                     remarks="Связка категории и фильтра">
+            <column name="category_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="filter_i_category_category_id_fkey"
+                             referencedTableName="category"
+                             referencedColumnNames="category_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="filter_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="filter_i_category_filter_id_fkey"
+                             referencedTableName="filter"
+                             referencedColumnNames="filter_id"
+                             nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="filter_j_category"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-product-j-attachment-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="product_j_attachment"
+                     remarks="Связка товаров и приложений">
+            <column name="product_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="product_j_attachment_id_fkey"
+                             referencedTableName="product"
+                             referencedColumnNames="product_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="attachment_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="attachment_id_j_product_id_fkey"
+                             referencedTableName="attachment"
+                             referencedColumnNames="attachment_id"
+                             nullable="false"/>
+            </column>
+            <column name="sort"
+                    type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="product_j_attachment"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2023-20-06-manufacturer-j-attachment-table" author="denis-kurapkin">
+        <createTable schemaName="public"
+                     tableName="manufacturer_j_attachment"
+                     remarks="Связка Производителей и приложений">
+            <column name="manufacturer_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="manufacturer_j_attachment_id_fkey"
+                             referencedTableName="manufacturer"
+                             referencedColumnNames="manufacturer_id"
+                             nullable="false"/>
+            </column>
+
+            <column name="attachment_id"
+                    type="uuid">
+                <constraints primaryKey="true"
+                             foreignKeyName="attachment_j_manufacturer_id_fkey"
+                             referencedTableName="attachment"
+                             referencedColumnNames="attachment_id"
+                             nullable="false"/>
+            </column>
+            <column name="sort"
+                    type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="public" tableName="manufacturer_j_attachment"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
